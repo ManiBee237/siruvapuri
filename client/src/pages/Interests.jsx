@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { matchAPI } from '../utils/api';
+import { showSuccess, showError } from '../utils/sweetalert';
 
 const Interests = () => {
   const [activeTab, setActiveTab] = useState('received');
@@ -31,10 +32,10 @@ const Interests = () => {
   const handleRespond = async (interestId, status) => {
     try {
       await matchAPI.respondToInterest({ interest_id: interestId, status });
-      alert(`Interest ${status} successfully!`);
+      showSuccess(`Interest ${status} successfully!`);
       fetchInterests();
     } catch (error) {
-      alert(error.response?.data?.error || 'Failed to respond to interest');
+      showError(error.response?.data?.error || 'Failed to respond to interest');
     }
   };
 

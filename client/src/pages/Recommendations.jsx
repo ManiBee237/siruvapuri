@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { matchAPI } from '../utils/api';
+import { showSuccess, showError } from '../utils/sweetalert';
 import ProfileCard from '../components/ProfileCard';
 
 const Recommendations = () => {
@@ -26,11 +27,11 @@ const Recommendations = () => {
   const handleInterestSent = async (profileId) => {
     try {
       await matchAPI.sendInterest({ receiver_id: profileId });
-      alert('Interest sent successfully!');
+      showSuccess('Interest sent successfully!');
       // Optionally remove from recommendations
       setRecommendations(recommendations.filter(r => r.id !== profileId));
     } catch (error) {
-      alert(error.response?.data?.error || 'Failed to send interest');
+      showError(error.response?.data?.error || 'Failed to send interest');
     }
   };
 

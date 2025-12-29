@@ -13,6 +13,7 @@ import Recommendations from './pages/Recommendations';
 import Search from './pages/Search';
 import ProfileView from './pages/ProfileView';
 import Interests from './pages/Interests';
+import EditProfile from './pages/EditProfile';
 
 function App() {
   return (
@@ -67,6 +68,15 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Interests />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/profile/edit"
+                element={
+                  <ProtectedRoute>
+                    <EditProfile />
                   </ProtectedRoute>
                 }
               />

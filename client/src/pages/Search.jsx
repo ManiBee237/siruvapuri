@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { matchAPI } from '../utils/api';
+import { showSuccess, showError } from '../utils/sweetalert';
 import ProfileCard from '../components/ProfileCard';
 
 const Search = () => {
@@ -43,7 +44,7 @@ const Search = () => {
       setResults(response.data.profiles || []);
     } catch (error) {
       console.error('Search error:', error);
-      alert('Search failed. Please try again.');
+      showError('Search failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -52,9 +53,9 @@ const Search = () => {
   const handleInterestSent = async (profileId) => {
     try {
       await matchAPI.sendInterest({ receiver_id: profileId });
-      alert('Interest sent successfully!');
+      showSuccess('Interest sent successfully!');
     } catch (error) {
-      alert(error.response?.data?.error || 'Failed to send interest');
+      showError(error.response?.data?.error || 'Failed to send interest');
     }
   };
 

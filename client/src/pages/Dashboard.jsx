@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { matchAPI } from '../utils/api';
 import ProfileCard from '../components/ProfileCard';
+import { showSuccess, showError } from '../utils/sweetalert';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -42,10 +43,10 @@ const Dashboard = () => {
   const handleInterestSent = async (profileId) => {
     try {
       await matchAPI.sendInterest({ receiver_id: profileId });
-      alert('Interest sent successfully!');
+      showSuccess('Interest sent successfully!');
       fetchDashboardData();
     } catch (error) {
-      alert(error.response?.data?.error || 'Failed to send interest');
+      showError(error.response?.data?.error || 'Failed to send interest');
     }
   };
 

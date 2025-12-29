@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { profileAPI, matchAPI } from '../utils/api';
+import { showSuccess, showError } from '../utils/sweetalert';
 
 const ProfileView = () => {
   const { id } = useParams();
@@ -18,7 +19,7 @@ const ProfileView = () => {
       setProfile(response.data.profile);
     } catch (error) {
       console.error('Error fetching profile:', error);
-      alert('Failed to load profile');
+      showError('Failed to load profile');
       navigate('/dashboard');
     } finally {
       setLoading(false);
@@ -28,9 +29,9 @@ const ProfileView = () => {
   const handleSendInterest = async () => {
     try {
       await matchAPI.sendInterest({ receiver_id: parseInt(id) });
-      alert('Interest sent successfully!');
+      showSuccess('Interest sent successfully!');
     } catch (error) {
-      alert(error.response?.data?.error || 'Failed to send interest');
+      showError(error.response?.data?.error || 'Failed to send interest');
     }
   };
 
