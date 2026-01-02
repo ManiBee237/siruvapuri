@@ -9,11 +9,13 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-4 mb-6 group">
-              <img
-                src="/images/logo.png"
-                alt="Siruvapuri Murugan Matrimony"
-                className="h-16 w-auto object-contain brightness-0 invert transition-transform duration-300 group-hover:scale-105"
-              />
+              <div className="h-16 w-16 bg-white rounded-lg p-1.5 flex items-center justify-center">
+                <img
+                  src="/images/logo.png"
+                  alt="Siruvapuri Murugan Matrimony"
+                  className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
               <div className="flex flex-col">
                 <h3 className="text-xl font-bold">
                   Siruvapuri Murugan
