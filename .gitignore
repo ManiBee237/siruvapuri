@@ -9,6 +9,11 @@ yarn.lock
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
+server/.env.production
+
+# Claude Code
+.claude/
 
 # Build outputs
 client/dist/

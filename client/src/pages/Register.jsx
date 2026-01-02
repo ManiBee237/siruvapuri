@@ -1,22 +1,54 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
+import { showSuccess, showError } from '../utils/sweetalert';
 
 const Register = () => {
+  const location = useLocation();
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    confirmPassword: '',
-    full_name: '',
+    first_name: '',
+    middle_name: '',
+    last_name: '',
     phone: '',
+    age: '',
     gender: '',
-    date_of_birth: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { register } = useAuth();
   const navigate = useNavigate();
+
+  // Pre-fill form with quick registration data if available
+  useEffect(() => {
+    // Check for data passed via navigation state
+    const quickData = location.state?.quickData;
+
+    // Also check localStorage as fallback
+    const storedData = localStorage.getItem('quickRegisterData');
+    const parsedStoredData = storedData ? JSON.parse(storedData) : null;
+
+    const data = quickData || parsedStoredData;
+
+    if (data) {
+      // Parse the name into first and last name
+      const nameParts = (data.name || '').trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      setFormData(prev => ({
+        ...prev,
+        first_name: firstName,
+        last_name: lastName,
+        email: data.email || '',
+        phone: data.mobile || '',
+        gender: data.gender || '',
+      }));
+
+      // Clear localStorage after using the data
+      localStorage.removeItem('quickRegisterData');
+    }
+  }, [location.state]);
 
   const handleChange = (e) => {
     setFormData({
@@ -28,29 +60,25 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
     setLoading(true);
 
-    const { confirmPassword, ...registrationData } = formData;
-    const result = await register(registrationData);
+    try {
+      const response = await axios.post('/api/auth/register', formData);
 
-    if (result.success) {
-      navigate('/dashboard');
-    } else {
-      setError(result.error);
+      if (response.data.success) {
+        await showSuccess(
+          'Registration successful! Please wait for admin approval to set your password.',
+          'Registration Submitted'
+        );
+        navigate('/');
+      }
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || 'Registration failed. Please try again.';
+      setError(errorMsg);
+      showError(errorMsg);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -73,17 +101,48 @@ const Register = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name *
+                <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-2">
+                  First Name *
                 </label>
                 <input
                   type="text"
-                  id="full_name"
-                  name="full_name"
-                  value={formData.full_name}
+                  id="first_name"
+                  name="first_name"
+                  value={formData.first_name}
                   onChange={handleChange}
                   className="input-field"
-                  placeholder="Your full name"
+                  placeholder="First name"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="middle_name" className="block text-sm font-medium text-gray-700 mb-2">
+                  Middle Name
+                </label>
+                <input
+                  type="text"
+                  id="middle_name"
+                  name="middle_name"
+                  value={formData.middle_name}
+                  onChange={handleChange}
+                  className="input-field"
+                  placeholder="Middle name (optional)"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-2">
+                  Last Name *
+                </label>
+                <input
+                  type="text"
+                  id="last_name"
+                  name="last_name"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  className="input-field"
+                  placeholder="Last name"
                   required
                 />
               </div>
@@ -106,7 +165,7 @@ const Register = () => {
 
               <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number
+                  Phone Number *
                 </label>
                 <input
                   type="tel"
@@ -116,6 +175,25 @@ const Register = () => {
                   onChange={handleChange}
                   className="input-field"
                   placeholder="9876543210"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-2">
+                  Age *
+                </label>
+                <input
+                  type="number"
+                  id="age"
+                  name="age"
+                  value={formData.age}
+                  onChange={handleChange}
+                  className="input-field"
+                  placeholder="Age"
+                  min="18"
+                  max="100"
+                  required
                 />
               </div>
 
@@ -137,55 +215,10 @@ const Register = () => {
                   <option value="other">Other</option>
                 </select>
               </div>
-
-              <div>
-                <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-2">
-                  Date of Birth
-                </label>
-                <input
-                  type="date"
-                  id="date_of_birth"
-                  name="date_of_birth"
-                  value={formData.date_of_birth}
-                  onChange={handleChange}
-                  className="input-field"
-                  max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
-                />
-              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                  Password *
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="input-field"
-                  placeholder="At least 6 characters"
-                  required
-                />
-              </div>
-
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm Password *
-                </label>
-                <input
-                  type="password"
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="input-field"
-                  placeholder="Re-enter password"
-                  required
-                />
-              </div>
+            <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg text-sm">
+              Note: Admin will create your password after approval. You'll be notified via email.
             </div>
 
             <button
@@ -193,7 +226,7 @@ const Register = () => {
               disabled={loading}
               className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Creating Account...' : 'Create Account'}
+              {loading ? 'Submitting Registration...' : 'Register'}
             </button>
           </form>
 
@@ -209,7 +242,10 @@ const Register = () => {
 
         <div className="mt-8 text-center">
           <p className="text-xs text-gray-500">
-            By creating an account, you agree to our Terms of Service and Privacy Policy
+            By creating an account, you agree to our{' '}
+            <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
+            {' '}and{' '}
+            <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
           </p>
         </div>
       </div>

@@ -12,6 +12,13 @@ export const AuthProvider = ({ children }) => {
     const initAuth = async () => {
       const token = localStorage.getItem('token');
       const storedUser = localStorage.getItem('user');
+      const isAdmin = localStorage.getItem('isAdmin');
+
+      // Skip auth initialization if this is an admin session
+      if (isAdmin === 'true') {
+        setLoading(false);
+        return;
+      }
 
       if (token && storedUser) {
         try {
@@ -20,7 +27,11 @@ export const AuthProvider = ({ children }) => {
           setIsAuthenticated(true);
         } catch (error) {
           console.error('Auth init error:', error);
-          logout();
+          // Clear invalid tokens
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setUser(null);
+          setIsAuthenticated(false);
         }
       }
       setLoading(false);
@@ -31,13 +42,29 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
+      // Clear any existing admin session and old user data completely
+      localStorage.removeItem('isAdmin');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setUser(null);
+
       const response = await authAPI.login(credentials);
-      const { token, user } = response.data;
+      const { token, user: loginUser } = response.data;
 
       localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
 
-      setUser(user);
+      // Fetch complete user data from server to get profile_picture and all fields
+      try {
+        const userResponse = await authAPI.getCurrentUser();
+        const fullUserData = userResponse.data.user;
+        localStorage.setItem('user', JSON.stringify(fullUserData));
+        setUser(fullUserData);
+      } catch {
+        // Fallback to login response user data
+        localStorage.setItem('user', JSON.stringify(loginUser));
+        setUser(loginUser);
+      }
+
       setIsAuthenticated(true);
 
       return { success: true };
@@ -70,10 +97,37 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    // Clear all user-related data from localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    // Don't remove isAdmin - that's managed by admin panel
     setUser(null);
     setIsAuthenticated(false);
+    // Force a page reload to clear any cached state
+    window.location.href = '/login';
+  };
+
+  // Update user data partially (e.g., after profile picture upload)
+  const updateUser = (updates) => {
+    setUser(prev => {
+      const updatedUser = { ...prev, ...updates };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      return updatedUser;
+    });
+  };
+
+  // Refresh user data from server
+  const refreshUser = async () => {
+    try {
+      const response = await authAPI.getCurrentUser();
+      const updatedUser = response.data.user;
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      return updatedUser;
+    } catch (error) {
+      console.error('Failed to refresh user data:', error);
+      return null;
+    }
   };
 
   const value = {
@@ -83,6 +137,8 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    updateUser,
+    refreshUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

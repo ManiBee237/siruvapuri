@@ -9,7 +9,12 @@ const auth = (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Support both user and admin tokens
     req.userId = decoded.userId;
+    req.adminId = decoded.adminId;
+    req.isAdmin = decoded.isAdmin || false;
+
     next();
   } catch (error) {
     res.status(401).json({ error: 'Invalid or expired token' });

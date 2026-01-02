@@ -11,19 +11,42 @@ DROP TABLE IF EXISTS matches CASCADE;
 DROP TABLE IF EXISTS preferences CASCADE;
 DROP TABLE IF EXISTS profiles CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS admins CASCADE;
+DROP TABLE IF EXISTS membership_plans CASCADE;
+
+-- Admins table
+CREATE TABLE admins (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  full_name VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 -- Users table
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   email VARCHAR(255) UNIQUE NOT NULL,
-  password VARCHAR(255) NOT NULL,
-  full_name VARCHAR(255) NOT NULL,
-  phone VARCHAR(20),
+  password VARCHAR(255), -- Nullable, set by admin after approval (hashed)
+  plain_password VARCHAR(255), -- Plain text password for admin reference
+  first_name VARCHAR(100) NOT NULL,
+  middle_name VARCHAR(100),
+  last_name VARCHAR(100) NOT NULL,
+  phone VARCHAR(20) NOT NULL,
+  age INTEGER NOT NULL,
   gender VARCHAR(10) NOT NULL CHECK (gender IN ('male', 'female', 'other')),
-  date_of_birth DATE,
+  payment_status VARCHAR(20) DEFAULT 'unpaid' CHECK (payment_status IN ('paid', 'unpaid')),
+  membership_type VARCHAR(20) DEFAULT NULL CHECK (membership_type IN ('gold', 'platinum', 'premium')),
+  membership_expiry DATE DEFAULT NULL,
+  is_approved BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Migration script to add membership columns to existing users table (run if upgrading)
+-- ALTER TABLE users ADD COLUMN IF NOT EXISTS membership_type VARCHAR(20) DEFAULT NULL CHECK (membership_type IN ('gold', 'platinum', 'premium'));
+-- ALTER TABLE users ADD COLUMN IF NOT EXISTS membership_expiry DATE DEFAULT NULL;
 
 -- Profiles table
 CREATE TABLE profiles (
@@ -94,9 +117,31 @@ CREATE TABLE profile_views (
   viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Membership Plans table
+CREATE TABLE membership_plans (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50) NOT NULL UNIQUE,
+  price DECIMAL(10,2) NOT NULL,
+  duration_months INTEGER NOT NULL,
+  features TEXT[] DEFAULT '{}',
+  color VARCHAR(100) DEFAULT 'from-gray-400 to-gray-600',
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert default membership plans
+INSERT INTO membership_plans (name, price, duration_months, features, color, is_active) VALUES
+  ('Gold', 2999, 3, ARRAY['View 50 Profiles', 'Send 25 Interests', 'Chat Support'], 'from-yellow-400 to-yellow-600', true),
+  ('Platinum', 4999, 6, ARRAY['View 150 Profiles', 'Send 75 Interests', 'Priority Support', 'Profile Highlight'], 'from-gray-300 to-gray-500', true),
+  ('Premium', 7999, 12, ARRAY['Unlimited Profiles', 'Unlimited Interests', '24/7 Support', 'Verified Badge', 'Featured Profile'], 'from-purple-400 to-purple-600', true);
+
 -- Create indexes for better performance
+CREATE INDEX idx_admins_email ON admins(email);
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_gender ON users(gender);
+CREATE INDEX idx_users_payment_status ON users(payment_status);
+CREATE INDEX idx_users_is_approved ON users(is_approved);
 CREATE INDEX idx_profiles_user_id ON profiles(user_id);
 CREATE INDEX idx_profiles_city ON profiles(city);
 CREATE INDEX idx_profiles_religion ON profiles(religion);
@@ -118,6 +163,9 @@ END;
 $$ language 'plpgsql';
 
 -- Create triggers for updated_at
+CREATE TRIGGER update_admins_updated_at BEFORE UPDATE ON admins
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 

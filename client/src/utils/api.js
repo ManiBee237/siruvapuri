@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.PROD
+  ? 'https://siruvapuri.webexcel.in/api'
+  : 'http://localhost:5000/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -28,9 +30,17 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+      const isAdmin = localStorage.getItem('isAdmin') === 'true';
+      const isAdminRoute = window.location.pathname.startsWith('/admin');
+
+      // Only clear tokens and redirect for non-admin user sessions
+      if (!isAdmin && !isAdminRoute) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
+      // For admin routes or admin sessions, just reject the error without redirect
+      // Admin pages will handle their own auth errors
     }
     return Promise.reject(error);
   }
@@ -40,6 +50,9 @@ export const authAPI = {
   register: (data) => api.post('/auth/register', data),
   login: (data) => api.post('/auth/login', data),
   getCurrentUser: () => api.get('/auth/me'),
+  forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
+  verifyOTP: (email, otp) => api.post('/auth/verify-otp', { email, otp }),
+  resetPassword: (email, resetToken, newPassword) => api.post('/auth/reset-password', { email, resetToken, newPassword }),
 };
 
 export const profileAPI = {
@@ -47,10 +60,15 @@ export const profileAPI = {
   getProfile: (id) => api.get(`/profile/${id}`),
   updatePreferences: (data) => api.put('/profile/preferences', data),
   getPreferences: () => api.get('/profile/preferences/get'),
+  getProfileViewsCount: () => api.get('/profile/views/count'),
+  uploadPhoto: (formData) => api.post('/profile/upload-photo', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
 };
 
 export const matchAPI = {
   getRecommendations: (limit = 10) => api.get(`/match/recommendations?limit=${limit}`),
+  getTopMatches: () => api.get('/match/top-matches'),
   searchProfiles: (params) => api.get('/match/search', { params }),
   sendInterest: (data) => api.post('/match/interest/send', data),
   getReceivedInterests: () => api.get('/match/interest/received'),

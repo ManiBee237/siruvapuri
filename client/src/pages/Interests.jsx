@@ -3,6 +3,53 @@ import { Link } from 'react-router-dom';
 import { matchAPI } from '../utils/api';
 import { showSuccess, showError } from '../utils/sweetalert';
 
+const InterestsSkeleton = () => (
+  <div className="min-h-screen bg-gray-50 py-8">
+    <div className="container mx-auto px-4">
+      <div className="mb-8 animate-pulse">
+        <div className="h-8 w-32 bg-gray-200 rounded mb-2"></div>
+        <div className="h-4 w-64 bg-gray-200 rounded"></div>
+      </div>
+
+      <div className="mb-6">
+        <div className="border-b border-gray-200">
+          <div className="flex space-x-8">
+            <div className="h-6 w-24 bg-gray-200 rounded py-4"></div>
+            <div className="h-6 w-20 bg-gray-200 rounded py-4"></div>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="card animate-pulse">
+            <div className="flex items-start space-x-4">
+              <div className="w-20 h-20 bg-gray-200 rounded-lg"></div>
+              <div className="flex-1">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-2">
+                    <div className="h-5 w-32 bg-gray-200 rounded"></div>
+                    <div className="h-4 w-48 bg-gray-200 rounded"></div>
+                    <div className="h-4 w-36 bg-gray-200 rounded"></div>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <div className="h-6 w-16 bg-gray-200 rounded-full"></div>
+                    <div className="h-3 w-20 bg-gray-200 rounded mt-1"></div>
+                  </div>
+                </div>
+                <div className="flex space-x-3 mt-4">
+                  <div className="h-9 w-20 bg-gray-200 rounded-lg"></div>
+                  <div className="h-9 w-20 bg-gray-200 rounded-lg"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 const Interests = () => {
   const [activeTab, setActiveTab] = useState('received');
   const [receivedInterests, setReceivedInterests] = useState([]);
@@ -43,9 +90,13 @@ const Interests = () => {
     <div className="card">
       <div className="flex items-start space-x-4">
         <img
-          src={interest.profile_picture || 'https://via.placeholder.com/100'}
+          src={interest.profile_picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(interest.full_name || 'User')}&size=100&background=00D26A&color=fff`}
           alt={interest.full_name}
           className="w-20 h-20 rounded-lg object-cover"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(interest.full_name || 'User')}&size=100&background=00D26A&color=fff`;
+          }}
         />
 
         <div className="flex-1">
@@ -94,13 +145,13 @@ const Interests = () => {
             <div className="flex space-x-3 mt-4">
               <button
                 onClick={() => handleRespond(interest.id, 'accepted')}
-                className="btn-primary text-sm py-2 px-4"
+                className="btn-primary text-sm py-2 px-4 cursor-pointer"
               >
                 Accept
               </button>
               <button
                 onClick={() => handleRespond(interest.id, 'rejected')}
-                className="btn-secondary text-sm py-2 px-4"
+                className="btn-secondary text-sm py-2 px-4 cursor-pointer"
               >
                 Decline
               </button>
@@ -112,11 +163,7 @@ const Interests = () => {
   );
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <InterestsSkeleton />;
   }
 
   return (

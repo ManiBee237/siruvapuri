@@ -7,6 +7,7 @@ const auth = require('../middleware/auth');
 router.use(auth);
 
 router.get('/recommendations', matchController.getDailyRecommendations);
+router.get('/top-matches', matchController.getTopMatches);
 router.get('/search', matchController.searchProfiles);
 router.post('/interest/send', matchController.sendInterest);
 router.get('/interest/received', matchController.getReceivedInterests);

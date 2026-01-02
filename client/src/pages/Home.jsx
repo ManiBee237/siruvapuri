@@ -1,161 +1,460 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { User, Search, Heart, Phone, Shield, Users, Flag, Settings } from 'lucide-react';
+import { AnimateOnScroll } from '../hooks/useScrollAnimation.jsx';
 
 const Home = () => {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    name: '',
+    gender: '',
+    email: '',
+    mobile: ''
+  });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleQuickRegister = (e) => {
+    e.preventDefault();
+    // Store quick registration data and redirect to full registration
+    localStorage.setItem('quickRegisterData', JSON.stringify(formData));
+    navigate('/register', { state: { quickData: formData } });
+  };
+
+  const successStories = [
+    {
+      id: 1,
+      names: 'Karthik & Lakshmi',
+      location: 'Chennai',
+      date: 'NOV 2023',
+      quote: 'We found each other through Siruvapuri Matrimony. The horoscope matching was precise and perfect.',
+      image: '/images/img/home/couple1.png'
+    },
+    {
+      id: 2,
+      names: 'Arun & Divya',
+      location: 'Coimbatore',
+      date: 'JAN 2024',
+      quote: 'A seamless experience. Our families connected instantly and everything fell into place.',
+      image: '/images/img/home/couple2.png'
+    },
+    {
+      id: 3,
+      names: 'Suresh & Meera',
+      location: 'Madurai',
+      date: 'MAR 2024',
+      quote: 'The verification process gave us trust and peace. Highly recommended for serious matches.',
+      image: '/images/img/home/couple3.png'
+    }
+  ];
+
+  const extendedStories = [
+    {
+      id: 4,
+      names: 'Karthik & Ishni',
+      info: 'South Indian - 32',
+      quote: 'We found each other through the platform and couldn\'t be happier. The profiles were genuine. Thank you for helping us start our journey together.',
+      image: '/images/img/cards/story1.png',
+      align: 'left'
+    },
+    {
+      id: 5,
+      names: 'Sammer & Aisha',
+      info: 'Chennai - 27',
+      quote: 'It was love at first sight thanks to the detailed profiles. The compatibility matching is spot on. We are grateful.',
+      image: '/images/img/cards/story2.png',
+      align: 'right'
+    },
+    {
+      id: 6,
+      names: 'Micheal & Ivisha',
+      info: 'Tamil - 32',
+      quote: 'Finding love later in life seemed difficult, but this site made it easy. We connected over shared values.',
+      image: '/images/img/cards/story3.png',
+      align: 'left'
+    }
+  ];
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary/10 to-primary/5 py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-800 mb-6">
-              Find Your Perfect
-              <span className="text-primary"> Life Partner</span>
-            </h1>
-            <p className="text-xl text-gray-600 mb-8">
-              Join thousands of happy couples who found their match through MatriMatch.
-              Your journey to a beautiful relationship starts here.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              {isAuthenticated ? (
-                <Link to="/dashboard" className="btn-primary text-lg px-8 py-3">
-                  Go to Dashboard
-                </Link>
-              ) : (
-                <>
-                  <Link to="/register" className="btn-primary text-lg px-8 py-3">
-                    Register Free
-                  </Link>
-                  <Link to="/login" className="btn-secondary text-lg px-8 py-3">
-                    Sign In
-                  </Link>
-                </>
-              )}
+      {/* Hero Section with Wedding Image Background */}
+      <section
+        className="relative min-h-[600px] bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: ` url('./images/home.png')`,
+          backgroundSize: 'cover',
+        }}
+      >
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30"></div>
+
+        <div className="relative container mx-auto px-4 py-16">
+          <AnimateOnScroll animation="fade-up" duration={800}>
+            <div className="max-w-2xl">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif italic text-white mb-4 mt-28 leading-tight">
+                Begin your auspicious journey toward divine union
+              </h1>
+              <p className="text-lg md:text-xl text-white/90 mb-8">
+                Find a soulmate who shares your heritage, values and beliefs. We bring together families with warmth.
+              </p>
             </div>
-          </div>
+          </AnimateOnScroll>
         </div>
+
+        {/* Quick Registration Form */}
+        {!isAuthenticated && (
+          <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-24 w-full max-w-5xl px-4">
+            <AnimateOnScroll animation="fade-up" delay={200} duration={800}>
+              <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 border border-gray-100">
+                <h2 className="text-center text-xl font-semibold text-gray-800 mb-6 flex items-center justify-center gap-2">
+                  <span className="text-2xl">🤝</span>
+                  Quick Registration
+                  <span className="text-2xl">🤝</span>
+                </h2>
+
+                <form onSubmit={handleQuickRegister} className="flex flex-col md:flex-row gap-4 items-end">
+                  <div className="flex-1 w-full">
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Your Name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300"
+                      required
+                    />
+                  </div>
+
+                  <div className="flex-1 w-full">
+                    <select
+                      name="gender"
+                      value={formData.gender}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white transition-all duration-300"
+                      required
+                    >
+                      <option value="">Gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                    </select>
+                  </div>
+
+                  <div className="flex-1 w-full">
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="email@example.com"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300"
+                      required
+                    />
+                  </div>
+
+                  <div className="flex-1 w-full">
+                    <div className="flex">
+                      <span className="px-3 py-3 bg-gray-100 border border-r-0 border-gray-300 rounded-l-xl text-gray-600">
+                        +91
+                      </span>
+                      <input
+                        type="tel"
+                        name="mobile"
+                        placeholder="Mobile Number"
+                        value={formData.mobile}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-r-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full md:w-auto px-8 py-3 bg-gradient-to-r from-primary to-green-500 hover:from-green-500 hover:to-primary text-white font-semibold rounded-xl transition-all duration-300 whitespace-nowrap shadow-lg shadow-primary/30 hover:shadow-xl hover:-translate-y-0.5"
+                  >
+                    CONTINUE
+                  </button>
+                </form>
+              </div>
+            </AnimateOnScroll>
+          </div>
+        )}
       </section>
 
-      {/* Features Section */}
+      {/* Spacer for registration form */}
+      {!isAuthenticated && <div className="h-32"></div>}
+
+      {/* Three Steps Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Why Choose MatriMatch?</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              We provide a secure and efficient platform to help you find your ideal life partner
+          <AnimateOnScroll animation="fade-up">
+            <div className="flex items-center justify-center mb-12">
+              <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent w-24"></div>
+              <Settings className="mx-4 text-primary" size={24} />
+              <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent w-24"></div>
+            </div>
+
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-4">
+              Three Steps For Your Muhurtham
+            </h2>
+            <p className="text-center text-gray-500 mb-12 max-w-2xl mx-auto">
+              Simple and easy process to find your perfect life partner
             </p>
-          </div>
+          </AnimateOnScroll>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <FeatureCard
-              icon={
-                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              }
-              title="Verified Profiles"
-              description="All profiles are verified to ensure authenticity and safety of our members"
-            />
-
-            <FeatureCard
-              icon={
-                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              }
-              title="Smart Matching"
-              description="Advanced algorithms to find the most compatible matches based on your preferences"
-            />
-
-            <FeatureCard
-              icon={
-                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              }
-              title="Privacy & Security"
-              description="Your data is protected with industry-standard security measures"
-            />
-
-            <FeatureCard
-              icon={
-                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              }
-              title="Advanced Search"
-              description="Filter profiles by education, occupation, location, and many more criteria"
-            />
-
-            <FeatureCard
-              icon={
-                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              }
-              title="Express Interest"
-              description="Show interest in profiles you like and connect with potential matches"
-            />
-
-            <FeatureCard
-              icon={
-                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              }
-              title="24/7 Support"
-              description="Our dedicated support team is always ready to help you"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <AnimateOnScroll animation="fade-up" delay={0}>
+              <StepCard
+                icon={<User className="text-primary" size={28} />}
+                iconBg="bg-primary/10"
+                title="Create Profile"
+                description="Share your basic details and preferences"
+                step="01"
+              />
+            </AnimateOnScroll>
+            <AnimateOnScroll animation="fade-up" delay={150}>
+              <StepCard
+                icon={<Search className="text-primary" size={28} />}
+                iconBg="bg-primary/10"
+                title="Find Your Matches"
+                description="See compatible profiles that match your muhurtham and expectations."
+                step="02"
+              />
+            </AnimateOnScroll>
+            <AnimateOnScroll animation="fade-up" delay={300}>
+              <StepCard
+                icon={<Heart className="text-primary" size={28} />}
+                iconBg="bg-primary/10"
+                title="Connect"
+                description="Families talk, share horoscopes, and plan the next step."
+                step="03"
+              />
+            </AnimateOnScroll>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-20 bg-primary text-white">
+      {/* Blessed Matches Section */}
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
-            <StatCard number="10,000+" label="Active Members" />
-            <StatCard number="2,500+" label="Success Stories" />
-            <StatCard number="50+" label="Cities Covered" />
-            <StatCard number="98%" label="Satisfaction Rate" />
+          <AnimateOnScroll animation="fade-up">
+            <div className="flex items-center justify-center mb-6">
+              <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent w-24"></div>
+              <div className="mx-4 text-primary">
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2Z"/>
+                </svg>
+              </div>
+              <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent w-24"></div>
+            </div>
+
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-2">
+              Blessed Matches from Our Community
+            </h2>
+            <div className="w-20 h-1 bg-gradient-to-r from-primary to-green-400 mx-auto mb-4 rounded-full"></div>
+            <p className="text-center text-gray-500 mb-12 max-w-2xl mx-auto">
+              Real stories from couples who found their perfect match through Siruvapuri Matrimony
+            </p>
+          </AnimateOnScroll>
+
+          {/* Success Stories Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
+            {successStories.map((story, index) => (
+              <AnimateOnScroll key={story.id} animation="fade-up" delay={index * 150}>
+                <SuccessStoryCard story={story} />
+              </AnimateOnScroll>
+            ))}
           </div>
+
+          {/* Extended Stories - Alternating Layout */}
+          <div className="max-w-5xl mx-auto space-y-20">
+            {extendedStories.map((story, index) => (
+              <AnimateOnScroll
+                key={story.id}
+                animation={story.align === 'left' ? 'fade-right' : 'fade-left'}
+                delay={100}
+              >
+                <ExtendedStoryCard story={story} />
+              </AnimateOnScroll>
+            ))}
+          </div>
+
+          {/* View More Stories Button */}
+          <AnimateOnScroll animation="fade-up" delay={200}>
+            <div className="text-center mt-16">
+              <Link
+                to="/success-stories"
+                className="inline-flex items-center px-8 py-3 border-2 border-gray-800 text-gray-800 font-semibold rounded-full hover:bg-gray-800 hover:text-white transition-all duration-300 hover:shadow-lg"
+              >
+                View More Stories →
+              </Link>
+            </div>
+          </AnimateOnScroll>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-gray-800 mb-6">
-            Ready to Find Your Perfect Match?
-          </h2>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Join MatriMatch today and take the first step towards a beautiful relationship
-          </p>
-          {!isAuthenticated && (
-            <Link to="/register" className="btn-primary text-lg px-8 py-3">
-              Register Now - It's Free!
-            </Link>
-          )}
+      {/* Safety & Trust Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+            {/* Left Content */}
+            <AnimateOnScroll animation="fade-right" className="lg:w-1/3">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
+                Safety & Trust<br />for Your Family
+              </h2>
+              <p className="text-gray-600">
+                Every profile is checked to ensure a trustworthy and secure matchmaking experience.
+              </p>
+            </AnimateOnScroll>
+
+            {/* Trust Features */}
+            <div className="flex flex-wrap justify-center gap-8 lg:gap-12">
+              <AnimateOnScroll animation="fade-up" delay={0}>
+                <TrustFeature
+                  icon={<Phone size={24} />}
+                  title="Mobile-verified"
+                  subtitle="Profiles"
+                />
+              </AnimateOnScroll>
+              <AnimateOnScroll animation="fade-up" delay={100}>
+                <TrustFeature
+                  icon={<Shield size={24} />}
+                  title="Manual Review"
+                  subtitle="by Team"
+                />
+              </AnimateOnScroll>
+              <AnimateOnScroll animation="fade-up" delay={200}>
+                <TrustFeature
+                  icon={<Users size={24} />}
+                  title="Family-oriented"
+                  subtitle="Matches"
+                />
+              </AnimateOnScroll>
+              <AnimateOnScroll animation="fade-up" delay={300}>
+                <TrustFeature
+                  icon={<Flag size={24} />}
+                  title="Report & Block"
+                  subtitle="Safety"
+                />
+              </AnimateOnScroll>
+            </div>
+          </div>
+
+          {/* Help Section */}
+          <AnimateOnScroll animation="fade-up" delay={200}>
+            <div className="flex flex-col md:flex-row items-center justify-between mt-16 pt-8 border-t border-gray-200 bg-gradient-to-r from-gray-50 to-white rounded-2xl p-8">
+              <div>
+                <h3 className="font-bold text-gray-800 text-lg">Need Help?</h3>
+                <p className="text-gray-600 text-sm">Our support team is here to assist you</p>
+              </div>
+              <div className="flex gap-4 mt-4 md:mt-0">
+                <a
+                  href="tel:+919999999999"
+                  className="px-6 py-2.5 border-2 border-gray-800 text-gray-800 font-semibold rounded-full hover:bg-gray-800 hover:text-white transition-all duration-300"
+                >
+                  Call Us
+                </a>
+                <a
+                  href="https://wa.me/919999999999"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-2.5 bg-gradient-to-r from-primary to-green-500 text-white font-semibold rounded-full transition-all duration-300 shadow-lg shadow-primary/30 hover:shadow-xl hover:-translate-y-0.5"
+                >
+                  Connect on WhatsApp
+                </a>
+              </div>
+            </div>
+          </AnimateOnScroll>
         </div>
       </section>
     </div>
   );
 };
 
-const FeatureCard = ({ icon, title, description }) => (
-  <div className="card text-center">
-    <div className="text-primary mb-4 flex justify-center">{icon}</div>
+// Step Card Component
+const StepCard = ({ icon, iconBg, title, description, step }) => (
+  <div className="bg-white border border-gray-100 rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-500 hover:-translate-y-2 group relative overflow-hidden">
+    <div className="absolute top-4 right-4 text-6xl font-bold text-gray-100 group-hover:text-primary/10 transition-colors duration-300">
+      {step}
+    </div>
+    <div className={`w-16 h-16 ${iconBg} rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300`}>
+      {icon}
+    </div>
     <h3 className="text-xl font-bold text-gray-800 mb-3">{title}</h3>
-    <p className="text-gray-600">{description}</p>
+    <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
   </div>
 );
 
-const StatCard = ({ number, label }) => (
-  <div>
-    <div className="text-4xl md:text-5xl font-bold mb-2">{number}</div>
-    <div className="text-lg opacity-90">{label}</div>
+// Success Story Card Component
+const SuccessStoryCard = ({ story }) => (
+  <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 group">
+    <div className="relative h-64 overflow-hidden">
+      <img
+        src={story.image}
+        alt={story.names}
+        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+        onError={(e) => {
+          e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(story.names)}&size=400&background=1EA826&color=fff`;
+        }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+      <span className="absolute bottom-4 left-4 bg-primary text-white text-xs font-semibold px-4 py-1.5 rounded-full">
+        {story.location}
+      </span>
+    </div>
+    <div className="p-6">
+      <h3 className="font-bold text-gray-800 text-lg mb-1">{story.names}</h3>
+      <p className="text-primary text-sm font-medium mb-4">MARRIED - {story.date}</p>
+      <div className="relative">
+        <span className="text-primary/30 text-5xl absolute -top-2 -left-2">"</span>
+        <p className="text-gray-600 text-sm italic pl-6 pr-4 leading-relaxed">{story.quote}</p>
+      </div>
+    </div>
+  </div>
+);
+
+// Extended Story Card Component
+const ExtendedStoryCard = ({ story }) => (
+  <div className={`flex flex-col ${story.align === 'right' ? 'md:flex-row-reverse' : 'md:flex-row'} gap-8 items-center`}>
+    <div className="w-full md:w-1/2">
+      <div className="relative overflow-hidden rounded-2xl shadow-xl group">
+        <img
+          src={story.image}
+          alt={story.names}
+          className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-700"
+          onError={(e) => {
+            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(story.names)}&size=600&background=1EA826&color=fff`;
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+      </div>
+    </div>
+    <div className="w-full md:w-1/2">
+      <h3 className="font-bold text-gray-800 text-2xl mb-2">{story.names}</h3>
+      <p className="text-primary font-medium mb-4">{story.info}</p>
+      <div className="flex items-start gap-2">
+        <span className="text-primary/30 text-4xl leading-none">"</span>
+        <p className="text-gray-600 italic leading-relaxed">{story.quote}</p>
+      </div>
+    </div>
+  </div>
+);
+
+// Trust Feature Component
+const TrustFeature = ({ icon, title, subtitle }) => (
+  <div className="text-center group">
+    <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3 text-gray-700 group-hover:bg-primary group-hover:text-white transition-all duration-300 group-hover:scale-110">
+      {icon}
+    </div>
+    <p className="font-semibold text-gray-800 text-sm">{title}</p>
+    <p className="text-gray-500 text-xs">{subtitle}</p>
   </div>
 );
 

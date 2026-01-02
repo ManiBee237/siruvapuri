@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { matchAPI } from '../utils/api';
 import { showSuccess, showError } from '../utils/sweetalert';
 import ProfileCard from '../components/ProfileCard';
+import CardSkeleton from '../components/CardSkeleton';
 
 const Search = () => {
   const [searchParams, setSearchParams] = useState({
@@ -56,6 +57,7 @@ const Search = () => {
       showSuccess('Interest sent successfully!');
     } catch (error) {
       showError(error.response?.data?.error || 'Failed to send interest');
+      throw error; // Re-throw to let ProfileCard know it failed
     }
   };
 
@@ -243,9 +245,7 @@ const Search = () => {
 
         {/* Search Results */}
         {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          </div>
+          <CardSkeleton count={8} />
         ) : searched ? (
           results.length > 0 ? (
             <>

@@ -132,16 +132,50 @@ npm install
 npm install
 ```
 
+## Admin Panel Setup
+
+After setting up the database and seeding data, you need to create an admin account:
+
+```bash
+# In server folder
+node scripts/createAdmin.js
+```
+
+This will create an admin account with:
+- Email: admin@siruvapuri.com
+- Password: admin123
+
+**IMPORTANT: Change the password after first login!**
+
+### Admin Panel Features
+
+1. Access admin panel: http://localhost:5173/admin/login
+2. Login with admin credentials
+3. Admin can:
+   - View all registered users
+   - Mark users as paid/unpaid
+   - Set passwords for paid users
+   - Approve users (automatically done when password is set)
+
+### User Registration Flow
+
+1. User registers with: first name, middle name, last name, email, phone, age, gender
+2. User is created with status: unpaid, not approved, no password
+3. Admin marks user as "paid" in admin panel
+4. Admin selects paid user from dropdown and sets password
+5. User is automatically approved when password is set
+6. User can now login with email and password
+
 ## Next Steps
 
 1. Customize the color scheme in `client/src/index.css` (TailwindCSS v4 uses CSS-based config)
-2. Add your logo/branding
+2. Change admin password after first login
 3. Add more features like:
    - Photo upload functionality
    - Chat messaging
    - Email notifications
-   - Payment integration
-   - Admin panel
+   - Payment integration gateway
+   - Advanced admin analytics
 
 ## Need Help?
 

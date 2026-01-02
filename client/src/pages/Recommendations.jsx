@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { matchAPI } from '../utils/api';
 import { showSuccess, showError } from '../utils/sweetalert';
 import ProfileCard from '../components/ProfileCard';
+import CardSkeleton from '../components/CardSkeleton';
 
 const Recommendations = () => {
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [limit, setLimit] = useState(20);
 
   useEffect(() => {
@@ -15,10 +17,17 @@ const Recommendations = () => {
   const fetchRecommendations = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await matchAPI.getRecommendations(limit);
       setRecommendations(response.data.recommendations || []);
-    } catch (error) {
-      console.error('Error fetching recommendations:', error);
+    } catch (err) {
+      console.error('Error fetching recommendations:', err);
+      const errorMsg = err.response?.data?.error || 'Failed to fetch recommendations';
+      setError(errorMsg);
+      // Don't show error toast for specific user status errors
+      if (!errorMsg.includes('not eligible') && !errorMsg.includes('Complete your profile')) {
+        showError(errorMsg);
+      }
     } finally {
       setLoading(false);
     }
@@ -32,6 +41,7 @@ const Recommendations = () => {
       setRecommendations(recommendations.filter(r => r.id !== profileId));
     } catch (error) {
       showError(error.response?.data?.error || 'Failed to send interest');
+      throw error; // Re-throw to let ProfileCard know it failed
     }
   };
 
@@ -48,9 +58,7 @@ const Recommendations = () => {
         </div>
 
         {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          </div>
+          <CardSkeleton count={8} />
         ) : recommendations.length > 0 ? (
           <>
             <div className="mb-6 text-sm text-gray-600">
@@ -79,6 +87,17 @@ const Recommendations = () => {
               </div>
             )}
           </>
+        ) : error ? (
+          <div className="card text-center py-12">
+            <svg className="w-16 h-16 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Unable to Load Recommendations</h3>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <button onClick={() => fetchRecommendations()} className="btn-primary">
+              Try Again
+            </button>
+          </div>
         ) : (
           <div className="card text-center py-12">
             <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

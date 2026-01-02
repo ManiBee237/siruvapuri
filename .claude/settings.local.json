@@ -1,7 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(psql:*)",
+      "Bash(npm run dev:*)",
+      "Bash(node -e:*)",
+      "Bash(npm install:*)",
+      "Bash(curl:*)",
+      "Bash(del Admin.jsx AdminCreateUser.jsx AdminAnalytics.jsx AdminAssignMatch.jsx AdminUserList.jsx AdminEditUser.jsx AdminDashboard.jsx AdminMatches.jsx AdminMembership.jsx AdminSetPassword.jsx AdminAssignMatchNew.jsx AdminLogin.jsx AdminManagePasswords.jsx AdminInterests.jsx AdminAssignMembership.jsx)",
+      "Bash(del AdminProtectedRoute.jsx AdminLayout.jsx)",
+      "Bash(del adminApi.js)",
+      "Bash(npm run build:*)"
     ]
   }
 }
