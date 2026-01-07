@@ -1,61 +1,85 @@
-# MatriMatch - Matrimonial Web Application
+# Siruvapuri - Matrimonial Web Application
 
-A modern, full-stack matrimonial web application built with React, Node.js, Express, and PostgreSQL. Find your perfect life partner with our intelligent matching system!
+A modern, full-stack matrimonial web application built with React, Node.js, Express, and PostgreSQL. Features an intelligent matching algorithm, admin panel, and Docker deployment support.
+
+![License](https://img.shields.io/badge/license-MIT-green)
+![Node](https://img.shields.io/badge/node-v16+-blue)
+![React](https://img.shields.io/badge/react-v19-blue)
+![PostgreSQL](https://img.shields.io/badge/postgresql-v12+-blue)
 
 ## Features
 
 ### User Features
-- **User Authentication**: Secure registration and login system with JWT tokens
-- **Profile Management**: Create and update detailed profiles with personal, educational, and professional information
-- **Smart Matching Algorithm**: Get personalized match recommendations based on preferences
-- **Advanced Search**: Filter profiles by age, height, education, religion, location, and more
-- **Interest Management**: Send and receive interests, accept or decline proposals
-- **Profile Views**: Track who viewed your profile
-- **Daily Recommendations**: Get curated profile suggestions daily
+- **User Authentication** - Secure registration and login with JWT tokens
+- **Profile Management** - Create and update detailed profiles with personal, educational, and professional information
+- **Smart Matching Algorithm** - Personalized match recommendations based on preferences
+- **Advanced Search** - Filter profiles by age, height, education, religion, location, and more
+- **Interest Management** - Send and receive interests, accept or decline proposals
+- **Profile Views** - Track who viewed your profile
+- **Daily Recommendations** - Curated profile suggestions daily
+- **Photo Upload** - AWS S3 integration for profile photos
+
+### Admin Features
+- **Dashboard Analytics** - Overview of users, matches, and activity
+- **User Management** - Create, edit, and manage user accounts
+- **Match Assignment** - Manually assign matches between users
+- **Membership Management** - Handle user subscriptions and memberships
+- **Interest Management** - Monitor and manage user interests
+- **Password Management** - Reset and manage user passwords
 
 ### Technical Features
-- Responsive design with TailwindCSS v4 (CSS-based configuration)
+- Responsive design with TailwindCSS v4
 - RESTful API architecture
 - PostgreSQL database with optimized indexes
 - JWT-based authentication
 - Protected routes and middleware
-- Input validation
-- Modern UI with card-based layouts
-- Real-time match score calculation
+- Input validation and sanitization
+- Docker containerization
+- Apache2 reverse proxy configuration
+- AWS S3 for image storage
+- Email notifications via Nodemailer
 
 ## Tech Stack
 
-### Frontend
-- **React** (v19.2.0) - UI library
-- **Vite** (v7.2.4) - Build tool and dev server
-- **TailwindCSS** (v4.1.18) - Utility-first CSS framework with CSS-based configuration (no JS config needed)
-- **React Router DOM** (v7.11.0) - Client-side routing
-- **Axios** (v1.13.2) - HTTP client
+### Frontend (Client & Admin)
+| Technology | Version | Description |
+|------------|---------|-------------|
+| React | 19.2.0 | UI library |
+| Vite | 7.2.4 | Build tool and dev server |
+| TailwindCSS | 4.1.18 | Utility-first CSS framework |
+| React Router DOM | 7.11.0 | Client-side routing |
+| Axios | 1.13.2 | HTTP client |
+| Framer Motion | 12.23.26 | Animations |
+| Chart.js | 4.5.1 | Analytics charts |
+| Lucide React | 0.562.0 | Icons |
+| SweetAlert2 | 11.26.17 | Alert dialogs |
 
 ### Backend
-- **Node.js** - Runtime environment
-- **Express** (v4.18.2) - Web framework
-- **PostgreSQL** (v8.11.3 pg driver) - Relational database
-- **bcryptjs** (v2.4.3) - Password hashing
-- **jsonwebtoken** (v9.0.2) - JWT authentication
-- **express-validator** (v7.0.1) - Input validation
-- **cors** (v2.8.5) - CORS middleware
-- **dotenv** (v16.3.1) - Environment variables
+| Technology | Version | Description |
+|------------|---------|-------------|
+| Node.js | 16+ | Runtime environment |
+| Express | 4.22.1 | Web framework |
+| PostgreSQL | 8.11.3 (pg) | Relational database |
+| bcryptjs | 2.4.3 | Password hashing |
+| jsonwebtoken | 9.0.2 | JWT authentication |
+| AWS SDK | 3.958.0 | S3 image storage |
+| Nodemailer | 7.0.12 | Email service |
+| Multer | 1.4.5 | File uploads |
 
 ## Project Structure
 
 ```
-siruvapuri_new/
-├── client/                 # React frontend
+siruvapuri/
+├── client/                    # User-facing React app
 │   ├── src/
-│   │   ├── components/    # Reusable components
+│   │   ├── components/        # Reusable components
 │   │   │   ├── Header.jsx
 │   │   │   ├── Footer.jsx
 │   │   │   ├── ProfileCard.jsx
 │   │   │   └── ProtectedRoute.jsx
-│   │   ├── context/       # React context
+│   │   ├── context/           # React context
 │   │   │   └── AuthContext.jsx
-│   │   ├── pages/         # Page components
+│   │   ├── pages/             # Page components
 │   │   │   ├── Home.jsx
 │   │   │   ├── Login.jsx
 │   │   │   ├── Register.jsx
@@ -64,122 +88,204 @@ siruvapuri_new/
 │   │   │   ├── Search.jsx
 │   │   │   ├── ProfileView.jsx
 │   │   │   └── Interests.jsx
-│   │   ├── utils/         # Utilities
-│   │   │   └── api.js
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   └── index.css
-│   ├── package.json
-│   └── vite.config.js
+│   │   └── utils/
+│   │       └── api.js
+│   ├── Dockerfile
+│   └── package.json
 │
-├── server/                # Node.js backend
+├── admin/                     # Admin panel React app
+│   ├── src/
+│   │   └── pages/
+│   │       ├── AdminDashboard.jsx
+│   │       ├── AdminUserList.jsx
+│   │       ├── AdminCreateUser.jsx
+│   │       ├── AdminEditUser.jsx
+│   │       ├── AdminMatches.jsx
+│   │       ├── AdminAssignMatch.jsx
+│   │       ├── AdminInterests.jsx
+│   │       ├── AdminMembership.jsx
+│   │       └── AdminAnalytics.jsx
+│   ├── Dockerfile
+│   └── package.json
+│
+├── server/                    # Node.js backend
 │   ├── config/
-│   │   ├── database.js   # PostgreSQL connection
-│   │   └── schema.sql    # Database schema
+│   │   ├── database.js        # PostgreSQL connection
+│   │   └── schema.sql         # Database schema
 │   ├── controllers/
 │   │   ├── authController.js
 │   │   ├── profileController.js
-│   │   └── matchController.js
+│   │   ├── matchController.js
+│   │   └── adminController.js
 │   ├── middleware/
-│   │   ├── auth.js       # JWT authentication
-│   │   └── validation.js # Input validation
+│   │   ├── auth.js            # JWT authentication
+│   │   └── validation.js      # Input validation
 │   ├── routes/
 │   │   ├── auth.js
 │   │   ├── profile.js
-│   │   └── match.js
-│   ├── seed.js           # Database seeding script
-│   ├── server.js         # Main server file
-│   ├── package.json
-│   └── .env              # Environment variables
+│   │   ├── match.js
+│   │   └── admin.js
+│   ├── seed.js                # Database seeding
+│   ├── server.js
+│   ├── Dockerfile
+│   └── package.json
 │
+├── docker-compose.yml         # Docker orchestration
+├── deploy.sh                  # One-step EC2 deployment
+├── siruvapuri-apache.conf     # Apache reverse proxy config
 └── README.md
 ```
 
-## Installation & Setup
+## Quick Start
 
 ### Prerequisites
-- Node.js (v16 or higher)
-- PostgreSQL (v12 or higher)
+- Node.js v16 or higher
+- PostgreSQL v12 or higher
 - npm or yarn
 
-### 1. Clone the Repository
+### Local Development
+
+**1. Clone the repository**
 ```bash
-git clone <repository-url>
-cd siruvapuri_new
+git clone https://github.com/webexcel/siruvapuri.git
+cd siruvapuri
 ```
 
-### 2. Database Setup
-
-1. Start your PostgreSQL server
-2. Create the database:
-
+**2. Setup the database**
 ```bash
-# Using psql command line
-psql -U postgres
-CREATE DATABASE matrimonial_db;
-\c matrimonial_db
-\i server/config/schema.sql
-\q
-```
+# Create database
+psql -U postgres -c "CREATE DATABASE matrimonial_db;"
 
-Or using a single command:
-```bash
-psql -U postgres -d postgres -c "CREATE DATABASE matrimonial_db;"
+# Run schema
 psql -U postgres -d matrimonial_db -f server/config/schema.sql
 ```
 
-### 3. Backend Setup
-
+**3. Configure environment**
 ```bash
-cd server
-npm install
+# Create server/.env
+cp server/.env.example server/.env
+# Edit with your database credentials and JWT secret
 ```
 
-Configure environment variables by editing `server/.env`:
+**4. Install dependencies and start**
+```bash
+# Backend
+cd server && npm install && npm run dev
+
+# Client (new terminal)
+cd client && npm install && npm run dev
+
+# Admin (new terminal)
+cd admin && npm install && npm run dev
+```
+
+**5. Access the apps**
+- Client: http://localhost:5173
+- Admin: http://localhost:5174
+- API: http://localhost:5000
+
+### Docker Deployment
+
+**One-step deployment on EC2:**
+```bash
+sudo ./deploy.sh
+```
+
+**Manual Docker commands:**
+```bash
+# Build and start all containers
+docker-compose up -d --build
+
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+```
+
+## Environment Variables
+
+### Server (.env)
 ```env
 PORT=5000
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
-DB_PASSWORD=your_postgres_password
+DB_PASSWORD=your_password
 DB_NAME=matrimonial_db
-JWT_SECRET=your_secret_key
-NODE_ENV=development
+JWT_SECRET=your_jwt_secret
+
+# AWS S3 (for image uploads)
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_key
+AWS_REGION=ap-south-1
+AWS_S3_BUCKET=your_bucket_name
+
+# Email (optional)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email
+SMTP_PASS=your_app_password
 ```
 
-Seed the database with sample data:
-```bash
-node seed.js
+### Client & Admin
+```env
+VITE_API_URL=http://localhost:5000/api
 ```
 
-Start the backend server:
-```bash
-npm start
-# or for development with auto-reload
-npm run dev
-```
+## API Endpoints
 
-The API will be running at `http://localhost:5000`
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | Register new user |
+| POST | `/api/auth/login` | Login user |
+| GET | `/api/auth/me` | Get current user |
 
-### 4. Frontend Setup
+### Profile
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| PUT | `/api/profile/update` | Update profile |
+| GET | `/api/profile/:id` | Get profile by ID |
+| PUT | `/api/profile/preferences` | Update preferences |
+| GET | `/api/profile/preferences/get` | Get preferences |
 
-```bash
-cd client
-npm install
-```
+### Matching
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/match/recommendations` | Get recommendations |
+| GET | `/api/match/search` | Search profiles |
+| POST | `/api/match/interest/send` | Send interest |
+| GET | `/api/match/interest/received` | Get received interests |
+| GET | `/api/match/interest/sent` | Get sent interests |
+| PUT | `/api/match/interest/respond` | Respond to interest |
 
-Start the development server:
-```bash
-npm run dev
-```
+### Admin
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/admin/login` | Admin login |
+| GET | `/api/admin/users` | Get all users |
+| POST | `/api/admin/users` | Create user |
+| PUT | `/api/admin/users/:id` | Update user |
+| DELETE | `/api/admin/users/:id` | Delete user |
+| GET | `/api/admin/stats` | Get dashboard stats |
 
-The frontend will be running at `http://localhost:5173`
+## Match Score Algorithm
 
-## Usage
+The system calculates match scores based on:
 
-### Test Credentials
+| Criteria | Points |
+|----------|--------|
+| Age compatibility | 30 |
+| Height preference | 20 |
+| Education match | 15 |
+| Religion match | 15 |
+| Location preference | 10 |
+| Marital status | 10 |
 
-After seeding the database, you can use these credentials to login:
+## Test Credentials
+
+After running `node server/seed.js`:
 
 **Male Account:**
 - Email: `john.doe@example.com`
@@ -189,85 +295,39 @@ After seeding the database, you can use these credentials to login:
 - Email: `priya.sharma@example.com`
 - Password: `password123`
 
-### API Endpoints
+## Deployment Architecture
 
-#### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/me` - Get current user (protected)
+```
+                    ┌─────────────────┐
+                    │   Apache2       │
+                    │   (SSL + Proxy) │
+                    └────────┬────────┘
+                             │
+        ┌────────────────────┼────────────────────┐
+        │                    │                    │
+        ▼                    ▼                    ▼
+┌───────────────┐   ┌───────────────┐   ┌───────────────┐
+│    Client     │   │     API       │   │    Admin      │
+│  (Port 3000)  │   │  (Port 5000)  │   │  (Port 3001)  │
+│    React      │   │   Node.js     │   │    React      │
+└───────────────┘   └───────┬───────┘   └───────────────┘
+                            │
+                            ▼
+                    ┌───────────────┐
+                    │  PostgreSQL   │
+                    │   Database    │
+                    └───────────────┘
+```
 
-#### Profile
-- `PUT /api/profile/update` - Update profile (protected)
-- `GET /api/profile/:id` - Get profile by ID (protected)
-- `PUT /api/profile/preferences` - Update preferences (protected)
-- `GET /api/profile/preferences/get` - Get preferences (protected)
+## Security Features
 
-#### Matching
-- `GET /api/match/recommendations` - Get daily recommendations (protected)
-- `GET /api/match/search` - Search profiles (protected)
-- `POST /api/match/interest/send` - Send interest (protected)
-- `GET /api/match/interest/received` - Get received interests (protected)
-- `GET /api/match/interest/sent` - Get sent interests (protected)
-- `PUT /api/match/interest/respond` - Respond to interest (protected)
-
-## Database Schema
-
-### Tables
-1. **users** - User authentication and basic info
-2. **profiles** - Detailed user profiles
-3. **preferences** - User matching preferences
-4. **matches** - Match records with scores
-5. **interests** - Interest/like management
-6. **profile_views** - Profile visit tracking
-
-## Features in Detail
-
-### Match Score Algorithm
-The system calculates match scores based on:
-- Age compatibility (30 points)
-- Height preference (20 points)
-- Education match (15 points)
-- Religion match (15 points)
-- Location preference (10 points)
-- Marital status (10 points)
-
-### Security Features
-- Password hashing with bcrypt
-- JWT token authentication
-- Protected API routes
+- Password hashing with bcrypt (10 rounds)
+- JWT token authentication with expiration
+- Protected API routes with middleware
 - Input validation and sanitization
 - CORS configuration
 - XSS and SQL injection prevention
-
-## Color Scheme
-
-- Primary: `#00D26A` (Green)
-- Primary Dark: `#00B85A`
-- Primary Light: `#33DD89`
-
-## Development
-
-### Build for Production
-
-**Backend:**
-```bash
-cd server
-npm start
-```
-
-**Frontend:**
-```bash
-cd client
-npm run build
-```
-
-The built files will be in `client/dist/`
-
-### Linting
-```bash
-cd client
-npm run lint
-```
+- HTTPS with Let's Encrypt SSL
 
 ## Contributing
 
@@ -280,7 +340,7 @@ npm run lint
 ## Troubleshooting
 
 ### Database Connection Issues
-- Ensure MySQL is running
+- Ensure PostgreSQL is running
 - Verify credentials in `.env` file
 - Check if database `matrimonial_db` exists
 
@@ -288,25 +348,26 @@ npm run lint
 - Change PORT in `server/.env` for backend
 - Frontend port can be changed in `vite.config.js`
 
-### CORS Errors
-- Verify API_BASE_URL in `client/src/utils/api.js`
-- Check CORS configuration in `server/server.js`
+### Docker Issues
+```bash
+# View container logs
+docker-compose logs -f api
+
+# Rebuild containers
+docker-compose up -d --build --force-recreate
+
+# Reset everything
+docker-compose down -v && docker-compose up -d --build
+```
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
-For support, email support@matrimatch.com or create an issue in the repository.
-
-## Acknowledgments
-
-- React team for the amazing library
-- TailwindCSS for the utility-first CSS framework
-- Express.js for the robust backend framework
-- MySQL for reliable data storage
+For support, create an issue in the repository or contact the development team.
 
 ---
 
-**Happy Matchmaking! 💚**
+**Made with React, Node.js, and PostgreSQL**
