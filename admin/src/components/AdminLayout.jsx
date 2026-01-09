@@ -81,7 +81,7 @@ const AdminLayout = ({ children }) => {
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           } w-64 lg:translate-x-0`}
         >
-          <nav className="p-4 space-y-2">
+          <nav className="p-4 pt-10 space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
               return (
